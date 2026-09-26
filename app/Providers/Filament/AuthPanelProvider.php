@@ -21,6 +21,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use TomatoPHP\FilamentTranslations\FilamentTranslationsPlugin;
 
 class AuthPanelProvider extends PanelProvider
 {
@@ -50,6 +51,18 @@ class AuthPanelProvider extends PanelProvider
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])
+            // Adds the Translations resource, where any `lang/` key can be
+            // overridden from the database and edited in place. A row wins over
+            // the file; a key with no row still resolves from `lang/`.
+            ->plugin(
+                FilamentTranslationsPlugin::make()
+                    // "Create" would invent keys no call site ever reads, and
+                    // "Clear" would drop every override and hand the whole app
+                    // back to the files. Both are one mis-click from losing work
+                    // that only exists in the database, so neither is offered.
+                    ->allowCreate(false)
+                    ->allowClearTranslations(false),
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

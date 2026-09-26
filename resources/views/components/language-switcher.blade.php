@@ -2,8 +2,10 @@
 
 @php
     $locale = app()->getLocale();
-    $locales = config('localization.locales', ['en', 'ar', 'fr']);
-    $names = config('localization.names', []);
+    // Read through the resolver rather than the config file, so a language added
+    // from the panel's Languages screen appears in the switcher with no deploy.
+    $locales = App\Support\Locales::codes();
+    $names = App\Support\Locales::names();
 
     // Overridable so a page that mounts the switcher twice can keep the two
     // controls distinguishable instead of emitting a duplicate `id`.

@@ -1,7 +1,7 @@
 @php
     $locale = app()->getLocale();
-    $locales = config('localization.locales', ['en', 'ar', 'fr']);
-    $names = config('localization.names', []);
+    $locales = App\Support\Locales::codes();
+    $names = App\Support\Locales::names();
 
     $selectId = 'fi-locale-switcher-select';
 @endphp

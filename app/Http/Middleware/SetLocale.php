@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Locales;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -21,15 +22,31 @@ class SetLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $supported = config('localization.locales', ['en', 'ar', 'fr']);
-        $routeLocale = $this->valid($request->route('locale'), $supported);
+        $supported = Locales::codes();
+
+        // The route's own locale parameter is a request to switch to that
+        // language, not a hint. Accepting it and then quietly serving something
+        // else would leave `/locale/xx` answering 200 while setting nothing, so
+        // a code the app does not offer is refused outright. The route constraint
+        // is only a shape check -- it cannot enumerate the languages, because a
+        // language added in the panel has to work without a deploy.
+        $requested = $request->route('locale');
+
+        if (is_string($requested) && ! in_array($requested, $supported, true)) {
+            abort(404);
+        }
+
+        $routeLocale = $this->valid($requested, $supported);
         $sessionLocale = $request->hasSession()
             ? $this->valid($request->session()->get('locale'), $supported)
             : null;
         $cookieLocale = $this->valid($request->cookie('ds_locale'), $supported);
         $browserLocale = $this->preferredLocale($request, $supported);
-        $defaultLocale = $this->valid(config('localization.default'), $supported)
-            ?? $this->valid(config('app.locale'), $supported)
+
+        // `Locales::default()` already resolves the database against the
+        // configured fallback, so it only has to be checked against the supported
+        // list like any other candidate.
+        $defaultLocale = $this->valid(Locales::default(), $supported)
             ?? ($supported[0] ?? 'en');
 
         $locale = $routeLocale
@@ -58,9 +75,9 @@ class SetLocale
 
         View::share([
             'currentLocale' => $locale,
-            'textDirection' => config("localization.directions.{$locale}", 'ltr'),
+            'textDirection' => Locales::direction($locale),
             'supportedLocales' => $supported,
-            'localeNames' => config('localization.names', []),
+            'localeNames' => Locales::names(),
         ]);
 
         $response = $next($request);

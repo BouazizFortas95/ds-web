@@ -1,6 +1,6 @@
 @php
     $locale = app()->getLocale();
-    $textDirection = $textDirection ?? config("localization.directions.{$locale}", 'ltr');
+    $textDirection = $textDirection ?? App\Support\Locales::direction($locale);
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}" dir="{{ $textDirection }}">

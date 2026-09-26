@@ -3,7 +3,7 @@
     use Filament\Facades\Filament;
 
     $locale = app()->getLocale();
-    $textDirection = $textDirection ?? config("localization.directions.{$locale}", 'ltr');
+    $textDirection = $textDirection ?? App\Support\Locales::direction($locale);
 
     // The dashboard is a Filament page, so the primary CTA links straight at the
     // panel rather than bouncing through the `/dashboard` redirect shim.

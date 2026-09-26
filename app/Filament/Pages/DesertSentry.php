@@ -246,8 +246,23 @@ class DesertSentry extends Page
         return __('site.dashboard.subheading');
     }
 
+    /**
+     * The sidebar entry, with a floor under it.
+     *
+     * A language added from the panel starts with no strings in it, and the
+     * loader answers an untranslated key with an empty string rather than
+     * falling back. Filament passes this label straight into an uninitialised
+     * typed property, so an empty one throws and takes down every page in the
+     * panel -- not just the dashboard -- with
+     * "Typed property NavigationItem::$label must not be accessed before
+     * initialization".
+     *
+     * The sidebar is chrome rather than content: an operator has to be able to
+     * navigate a half-translated panel to finish translating it, so this label
+     * falls back to English instead of disappearing.
+     */
     public static function getNavigationLabel(): string
     {
-        return __('site.dashboard.nav_label');
+        return __('site.dashboard.nav_label') ?: __('site.dashboard.nav_label', [], 'en') ?: 'Desert Sentry';
     }
 }

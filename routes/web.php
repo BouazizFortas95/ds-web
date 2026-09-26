@@ -44,7 +44,14 @@ Route::middleware('locale')->group(function () use ($loginThrottle): void {
 
     // The `locale` path parameter is resolved by the SetLocale middleware, which
     // writes the session and the cookie before this action runs.
+    //
+    // The constraint is a shape, not a list of the languages that exist today.
+    // Enumerating them here was evaluated once while the routes were being
+    // registered, so a language added later would be a dead link in the switcher
+    // and a 404 here even though every screen listed it. Whether the code names
+    // a language the app actually offers is settled by the middleware, which
+    // ignores one it does not know and falls through to the next candidate.
     Route::get('/locale/{locale}', LocaleController::class)
-        ->whereIn('locale', config('localization.locales', ['en', 'ar', 'fr']))
+        ->where('locale', '[a-zA-Z]{2,3}(_[A-Za-z]{2,4})?')
         ->name('locale.set');
 });
