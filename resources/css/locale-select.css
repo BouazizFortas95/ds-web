@@ -1,0 +1,32 @@
+/*
+|--------------------------------------------------------------------------
+| Shared language `<select>`
+|--------------------------------------------------------------------------
+|
+| The marketing site and the Filament panel render the same locale picker, and
+| they compile to two separate Vite bundles, so this rule is shared by source
+| rather than duplicated. Import it from every stylesheet entry that renders a
+| `[data-ds-locale-select]` control.
+|
+| `appearance: none` removes the browser's own arrow, which is drawn from the
+| page colour scheme and reads as a pale wedge against these near-black
+| surfaces. `color-scheme: dark` is what darkens the *dropdown list* once it
+| opens -- without it the popup stays white under a dark closed control.
+|
+| The chevron sits on the right unconditionally. Both call sites force the
+| control itself to `dir="ltr"` so the three language names read as one set, and
+| flipping the chevron on Arabic pages would only desynchronise it from the text.
+|
+*/
+
+@layer components {
+    .ds-locale-select {
+        appearance: none;
+        color-scheme: dark;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2364748b' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.55rem center;
+        background-size: 0.9rem 0.9rem;
+    }
+}
